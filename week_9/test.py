@@ -1,7 +1,7 @@
 import requests
 
 def invoke_lambda_function(image_url):
-    lambda_invoke_url = 'http://localhost:8080/2015-03-31/functions/function/invocations'
+    lambda_invoke_url = 'https://7qvw3yo7hj.execute-api.eu-west-3.amazonaws.com/test/predict'
     payload = {'url': image_url}
 
     response = requests.post(lambda_invoke_url, json=payload)
