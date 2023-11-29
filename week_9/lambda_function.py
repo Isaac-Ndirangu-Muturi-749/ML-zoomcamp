@@ -1,19 +1,20 @@
+import os
 import tflite_runtime.interpreter as tflite
 from io import BytesIO
 from urllib import request
 from PIL import Image
 import numpy as np
 
+MODEL_NAME = os.getenv('MODEL_NAME', 'bees-wasps-v2.tflite')
+
 # Load the TF-Lite model
-interpreter = tflite.Interpreter(model_path="bees-wasps.tflite")
+interpreter = tflite.Interpreter(model_path=MODEL_NAME)
 interpreter.allocate_tensors()
 
 def download_image(url):
     with request.urlopen(url) as resp:
-        buffer = resp.read()
-    stream = BytesIO(buffer)
-    img = Image.open(stream)
-    return img
+        img_data = resp.read()
+    return Image.open(BytesIO(img_data))
 
 def prepare_image(img, target_size):
     if img.mode != 'RGB':
@@ -47,8 +48,8 @@ def predict(url):
     output_tensor_index = interpreter.get_output_details()[0]['index']
     model_output = interpreter.tensor(output_tensor_index)()
 
-    # Adjust based on the actual output
-    return model_output
+    # Return the result (assuming it's a regression output)
+    return float(model_output[0, 0])
 
 def lambda_handler(event, context):
     url = event['url']
